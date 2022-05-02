@@ -1,0 +1,18 @@
+#!/bin/python3
+import asyncio
+import websockets
+import json
+
+URL = 'ws://127.0.0.1:2000/api/v2/connect'
+SOURCE_CODE = 'echo \\"Hello World!\\"\\nsleep 1\\necho \\"Ok\\"'
+JSON_STRING = f'{{ "type": "init", "language": "bash", "version": "*", "files": [{{ "content": "{SOURCE_CODE}" }}]}}'
+print(JSON_STRING)
+
+async def run():
+    async with websockets.connect(URL) as websocket:
+        await websocket.send(JSON_STRING)
+        while True:
+            msg = await websocket.recv()
+            print(msg)
+
+asyncio.run(run())

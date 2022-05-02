@@ -12,6 +12,7 @@ VERSION = '*'
 response = requests.post(PISTON_URL, json={
     'runtime_id': RUNTIME_ID,
     'version': '*',
+    'stdin': 'hello',
     'files': [{ 'content': SOURCE_CODE }]
 })
 
