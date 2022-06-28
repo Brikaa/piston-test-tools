@@ -4,12 +4,13 @@ import websockets
 import json
 import sys
 
-URL = 'ws://127.0.0.1:2000/api/v3/connect'
-RUNTIME_ID = int(sys.argv[1])
+URL = 'ws://127.0.0.1:2000/api/v2/connect'
+LANGUAGE = sys.argv[1]
 SOURCE_CODE = open(sys.argv[2]).read()
 JSON_DICT = {
     'type': 'init',
-    'runtime_id': RUNTIME_ID,
+    'language': LANGUAGE,
+    'version': '*',
     'files': [{ 'content': SOURCE_CODE }]
 }
 JSON = json.dumps(JSON_DICT)

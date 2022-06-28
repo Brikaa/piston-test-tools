@@ -1,1 +1,1 @@
-cat -
+echo "Hello World!"
