@@ -1,1 +1,1 @@
-ls ../
+echo 'Hello world'
