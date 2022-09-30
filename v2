@@ -17,7 +17,7 @@ response = requests.post(PISTON_URL, json={
     'version': VERSION,
     'runtime': RUNTIME,
     'files': [{'content': SOURCE_CODE}],
-    'packages': ["pandas"]
+    'packages': ["pandas", "numpy"]
 })
 
 print(json.dumps(response.json(), indent=4).replace('\\n', '\n'))

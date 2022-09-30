@@ -16,6 +16,6 @@ futures = [session.post(PISTON_URL, json={
     'version': VERSION,
     'runtime': RUNTIME,
     'files': [{ 'content': SOURCE_CODE }]
-}) for i in range(30)]
+}) for i in range(1000)]
 
 print(*[future.result().json() for future in futures], sep='\n')
