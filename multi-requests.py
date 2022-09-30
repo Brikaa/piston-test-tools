@@ -3,10 +3,12 @@ import sys
 from requests_futures.sessions import FuturesSession
 
 PISTON_URL = 'http://127.0.0.1:2000/api/v2/execute'
-LANGUAGE = sys.argv[1]
-SOURCE_CODE_FILE = open(sys.argv[2])
+FILE_NAME = sys.argv[1]
+[_, LANGUAGE] = sys.argv[1].split('.')
+SOURCE_CODE_FILE = open(FILE_NAME)
 SOURCE_CODE = SOURCE_CODE_FILE.read()
 SOURCE_CODE_FILE.close()
+NO_REQUESTS = int(sys.argv[2]) if len(sys.argv) >= 3 else 16
 VERSION = sys.argv[3] if len(sys.argv) >= 4 else '*'
 RUNTIME = sys.argv[4] if len(sys.argv) >= 5 else None
 
@@ -16,6 +18,5 @@ futures = [session.post(PISTON_URL, json={
     'version': VERSION,
     'runtime': RUNTIME,
     'files': [{ 'content': SOURCE_CODE }]
-}) for i in range(1000)]
+}) for i in range(NO_REQUESTS)]
 
-print(*[future.result().json() for future in futures], sep='\n')

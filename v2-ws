@@ -18,5 +18,11 @@ JSON = json.dumps(JSON_DICT)
 async def run():
     async with websockets.connect(URL) as websocket:
         await websocket.send(JSON)
+        while True:
+            try:
+                res = await websocket.recv()
+                print(res)
+            except:
+                break
 
 asyncio.run(run())
