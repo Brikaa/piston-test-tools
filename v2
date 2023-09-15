@@ -1,23 +1,27 @@
 #!/bin/python3
-import sys
 import requests
 import json
+import argparse
 
 PISTON_URL = 'http://127.0.0.1:2000/api/v2/execute'
-FILE_NAME = sys.argv[1]
-SOURCE_CODE_FILE = open(FILE_NAME)
-LANGUAGE = FILE_NAME.split('.')[1]
-SOURCE_CODE = SOURCE_CODE_FILE.read()
-SOURCE_CODE_FILE.close()
-VERSION = sys.argv[2] if len(sys.argv) >= 3 else '*'
-RUNTIME = sys.argv[3] if len(sys.argv) >= 4 else None
 
+parser = argparse.ArgumentParser()
+parser.add_argument('test_file')
+parser.add_argument('--version', default='*')
+parser.add_argument('--runtime')
+parser.add_argument('--filename')
+
+args = parser.parse_args()
+file_name = args.test_file
+source_code_file = open(file_name)
+language = file_name.split('.')[1]
+source_code = source_code_file.read()
+source_code_file.close()
 response = requests.post(PISTON_URL, json={
-    'language': LANGUAGE,
-    'version': VERSION,
-    'runtime': RUNTIME,
-    'files': [{'content': SOURCE_CODE}],
-    'packages': ["pandas", "numpy"]
+    'language': language,
+    'version': args.version,
+    'runtime': args.runtime,
+    'files': [{'name': args.filename, 'content': source_code}]
 })
 
 print(json.dumps(response.json(), indent=4).replace('\\n', '\n'))
