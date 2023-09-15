@@ -34,7 +34,8 @@ async def ws_run():
             try:
                 res = await websocket.recv()
                 print(res)
-            except:
+            except websockets.exceptions.ConnectionClosed as e:
+                print(e)
                 break
 
 
