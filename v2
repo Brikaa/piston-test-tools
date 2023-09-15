@@ -1,27 +1,46 @@
-#!/bin/python3
+#!./venv/bin/python3
 import requests
 import json
 import argparse
-
-PISTON_URL = 'http://127.0.0.1:2000/api/v2/execute'
+import asyncio
+import websockets
 
 parser = argparse.ArgumentParser()
-parser.add_argument('test_file')
-parser.add_argument('--version', default='*')
-parser.add_argument('--runtime')
-parser.add_argument('--filename')
+parser.add_argument("test_file")
+parser.add_argument("--version", default="*")
+parser.add_argument("--runtime")
+parser.add_argument("--filename")
+parser.add_argument("--mode", default="stateless")
 
 args = parser.parse_args()
+
 file_name = args.test_file
 source_code_file = open(file_name)
-language = file_name.split('.')[1]
+language = file_name.split(".")[1]
 source_code = source_code_file.read()
 source_code_file.close()
-response = requests.post(PISTON_URL, json={
-    'language': language,
-    'version': args.version,
-    'runtime': args.runtime,
-    'files': [{'name': args.filename, 'content': source_code}]
-})
+request = {
+    "language": language,
+    "version": args.version,
+    "runtime": args.runtime,
+    "files": [{"name": args.filename, "content": source_code}],
+}
 
-print(json.dumps(response.json(), indent=4).replace('\\n', '\n'))
+
+async def ws_run():
+    async with websockets.connect("ws://127.0.0.1:2000/api/v2/connect") as websocket:
+        await websocket.send(json.dumps(request))
+        while True:
+            try:
+                res = await websocket.recv()
+                print(res)
+            except:
+                break
+
+
+if args.mode == "stateless":
+    response = requests.post("http://127.0.0.1:2000/api/v2/execute", json=request)
+    print(json.dumps(response.json(), indent=4).replace("\\n", "\n"))
+else:
+    request["type"] = "init"
+    asyncio.run(ws_run())
