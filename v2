@@ -40,7 +40,11 @@ async def ws_run():
 
 if args.mode == "stateless":
     response = requests.post("http://127.0.0.1:2000/api/v2/execute", json=request)
-    print(json.dumps(response.json(), indent=4).replace("\\n", "\n"))
+    if (response.status_code == 500):
+        print("500 internal server error")
+    else:
+        print(response.status_code)
+        print(json.dumps(response.json(), indent=4).replace("\\n", "\n"))
 else:
     request["type"] = "init"
     asyncio.run(ws_run())
