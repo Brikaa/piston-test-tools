@@ -11,6 +11,7 @@ parser.add_argument("--version", default="*")
 parser.add_argument("--runtime")
 parser.add_argument("--filename")
 parser.add_argument("--mode", default="stateless")
+parser.add_argument("--api", default="local")
 
 args = parser.parse_args()
 
@@ -19,6 +20,11 @@ source_code_file = open(file_name)
 language = file_name.split(".")[1]
 source_code = source_code_file.read()
 source_code_file.close()
+base_url = "127.0.0.1:2000/api/v2"
+ssl = ""
+if args.api == "public":
+    base_url = "emkc.org/api/v2/piston"
+    ssl = "s"
 request = {
     "language": language,
     "version": args.version,
@@ -28,7 +34,7 @@ request = {
 
 
 async def ws_run():
-    async with websockets.connect("ws://127.0.0.1:2000/api/v2/connect") as websocket:
+    async with websockets.connect(f"ws://{base_url}/connect") as websocket:
         await websocket.send(json.dumps(request))
         while True:
             try:
@@ -40,11 +46,10 @@ async def ws_run():
 
 
 if args.mode == "stateless":
-    response = requests.post("http://127.0.0.1:2000/api/v2/execute", json=request)
-    if (response.status_code == 500):
-        print("500 internal server error")
-    else:
+    response = requests.post(f"http{ssl}://{base_url}/execute", json=request)
+    if (response.status_code >= 400):
         print(response.status_code)
+    else:
         print(json.dumps(response.json(), indent=4).replace("\\n", "\n"))
 else:
     request["type"] = "init"
